@@ -101,7 +101,7 @@ function OhziInteractionLayer() {
     }
   }, [])
 
-  const goExplore = () => document.querySelector('#projects')?.scrollIntoView({ behavior: 'smooth' })
+  const goExplore = () => { const alreadyEntered = document.querySelector('.hero--explored'); window.dispatchEvent(new CustomEvent('portfolio:explore')); if (alreadyEntered) document.querySelector('#projects')?.scrollIntoView({ behavior: 'smooth' }) }
   const startHold = () => {
     setHolding(true)
     holdTimerRef.current = window.setTimeout(goExplore, 680)
@@ -165,6 +165,15 @@ function SectionHead({ eyebrow, title, sub }) {
 
 function StudioHero() {
   const stageRef = useRef(null)
+  const [entered, setEntered] = useState(false)
+  const [activePanel, setActivePanel] = useState(0)
+  const active = STUDIO_PANELS[activePanel]
+
+  useEffect(() => {
+    const enter = () => setEntered(true)
+    window.addEventListener('portfolio:explore', enter)
+    return () => window.removeEventListener('portfolio:explore', enter)
+  }, [])
 
   const handlePointerMove = (event) => {
     const el = stageRef.current
@@ -187,7 +196,9 @@ function StudioHero() {
     el.style.setProperty('--tilt-y', '0deg')
   }
 
-  return <section id="hero" className="hero hero--studio"><ParticleCanvas /><div className="studio-noise" /><div className="studio-orbits" aria-hidden="true"><span /><span /><span /><b>SHIP</b><b>BUILD</b><b>TRACE</b></div><div className="studio-marquee" aria-hidden="true"><span>BUILD / SHIP / VERIFY / REPEAT / </span><span>BUILD / SHIP / VERIFY / REPEAT / </span></div><div className="studio-layout"><aside className="studio-index hero-piece"><span>Portfolio 2026</span><strong>FSX</strong><small>Dongguan / Remote</small></aside><main className="studio-copy hero-piece"><p className="studio-kicker">Independent Application Builder</p><h1 className="sr-only">冯诗鑫</h1><div className="studio-title" aria-hidden="true"><span>我做</span><span>能跑起来的工具</span></div><p className="studio-lede">把想法拆成页面、接口、自动化流程，再让它稳定交付。</p><div className="studio-actions"><a href="#projects" className="btn btn-primary">查看项目现场</a><a href="#certs" className="btn btn-ghost">查看证书凭证</a></div></main><div className="studio-stage hero-piece" ref={stageRef} onPointerMove={handlePointerMove} onPointerLeave={resetPointer}><div className="studio-stage-inner"><div className="studio-scan" /><div className="studio-meter"><span /><span /><span /><span /><span /></div><div className="studio-terminal"><div className="studio-terminal-bar"><span /><span /><span /><strong>current-build.log</strong></div>{HERO_LOGS.map((line, index) => <p key={line}><span>{String(index + 1).padStart(2, '0')}</span>{line}</p>)}</div><div className="studio-panels">{STUDIO_PANELS.map((panel, index) => <article className="studio-panel" style={{ '--panel-index': index }} key={panel.code}><span>{panel.code}</span><h3>{panel.title}</h3><p>{panel.meta}</p><small>{panel.status}</small></article>)}</div><div className="studio-live"><i /> Live prototype surface</div></div></div></div><div className="studio-bottom hero-piece"><span>4 个完整项目</span><span>3 Agent 架构</span><span>100% 提醒到达</span><span>React + GSAP</span></div><div className="studio-explore-hint hero-piece"><span>DRAG / HOLD / SCROLL</span><strong>Explore the build</strong></div><div className="scroll-cue"><span /></div></section>
+  const enterSite = () => setEntered(true)
+
+  return <section id="hero" className={'hero hero--studio' + (entered ? ' hero--explored' : ' hero--gate')}><ParticleCanvas /><div className="studio-noise" /><div className="studio-orbits" aria-hidden="true"><span /><span /><span /><b>SHIP</b><b>BUILD</b><b>TRACE</b></div><div className="studio-marquee" aria-hidden="true"><span>BUILD / SHIP / VERIFY / REPEAT / </span><span>BUILD / SHIP / VERIFY / REPEAT / </span></div><div className="polygon-gate hero-piece" aria-hidden={entered ? 'true' : 'false'}><button className="polygon-stage" type="button" onClick={enterSite} aria-label="进入作品集"><svg viewBox="0 0 420 420" className="polygon-svg" role="img" aria-label="动态多边形入口"><polygon className="polygon polygon--back" points="210,34 358,120 326,302 178,384 46,238 92,82" /><polygon className="polygon polygon--front" points="210,78 318,154 288,286 186,332 88,230 126,118" /><polyline className="polygon-line" points="210,34 318,154 326,302 88,230 92,82 288,286 358,120 186,332 46,238 126,118 210,34" /></svg><span className="polygon-core">FSX</span></button><div className="polygon-copy"><span>HOLD / TAP TO ENTER</span><strong>先探索，再显示信息</strong><p>像一个项目入口：未点击前保持克制，互动后展开你的项目现场。</p></div></div><div className="studio-layout" aria-hidden={entered ? 'false' : 'true'}><aside className="studio-index hero-piece"><span>Portfolio 2026</span><strong>FSX</strong><small>Dongguan / Remote</small></aside><main className="studio-copy hero-piece"><p className="studio-kicker">Independent Application Builder</p><h1 className="sr-only">冯诗鑫</h1><div className="studio-title" aria-hidden="true"><span>我做</span><span>能跑起来的工具</span></div><p className="studio-lede">把想法拆成页面、接口、自动化流程，再让它稳定交付。</p><div className="studio-actions"><a href="#projects" className="btn btn-primary">查看项目现场</a><a href="#certs" className="btn btn-ghost">查看证书凭证</a></div></main><div className="studio-stage hero-piece" ref={stageRef} onPointerMove={handlePointerMove} onPointerLeave={resetPointer}><div className="studio-stage-inner"><div className="studio-scan" /><div className="studio-meter"><span /><span /><span /><span /><span /></div><div className="studio-terminal"><div className="studio-terminal-bar"><span /><span /><span /><strong>{active.status}</strong></div>{HERO_LOGS.map((line, index) => <p key={line}><span>{String(index + 1).padStart(2, '0')}</span>{line}</p>)}</div><div className="studio-panels">{STUDIO_PANELS.map((panel, index) => <button className={'studio-panel' + (activePanel === index ? ' studio-panel--active' : '')} type="button" style={{ '--panel-index': index }} key={panel.code} onClick={() => setActivePanel(index)}><span>{panel.code}</span><h3>{panel.title}</h3><p>{panel.meta}</p><small>{panel.status}</small></button>)}</div><div className="studio-live"><i /> {active.title}</div></div></div></div><div className="studio-bottom hero-piece"><span>4 个完整项目</span><span>3 Agent 架构</span><span>100% 提醒到达</span><span>React + GSAP</span></div><div className="studio-explore-hint hero-piece"><span>CLICK PANELS / HOLD / SCROLL</span><strong>Explore the build</strong></div><div className="scroll-cue"><span /></div></section>
 }
 
 function Hero() {
@@ -256,6 +267,7 @@ export default function App() {
   }, { scope: appRef })
   return <div ref={appRef}><div className="noise-overlay" /><Navbar /><FabTop /><OhziInteractionLayer /><Hero /><AboutSection /><ProjectsSection /><CertsSection /><SkillsSection /><ContactSection /></div>
 }
+
 
 
 
