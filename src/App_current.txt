@@ -1,0 +1,603 @@
+﻿import { useState, useEffect, useRef } from 'react'
+
+import './App.css'
+
+
+
+function Reveal({children, delay=0, className=''}) {
+
+  const ref = useRef(null)
+
+  const [vis, setVis] = useState(false)
+
+  useEffect(() => {
+
+    const el = ref.current
+
+    if (!el) return
+
+    const obs = new IntersectionObserver(([e]) => { if(e.isIntersecting){setVis(true);obs.disconnect()} }, {threshold:0.15})
+
+    obs.observe(el)
+
+    return () => obs.disconnect()
+
+  },[])
+
+  const cls = 'reveal' + (vis?' reveal--visible':'') + (delay?' reveal--delay-'+delay:'') + (className?' '+className:'')
+
+  return <div ref={ref} className={cls}>{children}</div>
+
+}
+
+
+
+function FabTop() {
+
+  const [show,setShow] = useState(false)
+
+  useEffect(()=>{ const h=()=>setShow(window.scrollY>400); window.addEventListener('scroll',h,{passive:true}); return()=>window.removeEventListener('scroll',h) },[])
+
+  return <button className={'fab-top'+(show?' fab-top--show':'')} onClick={()=>window.scrollTo({top:0,behavior:'smooth'})} aria-label="Back to top">�?/button>
+
+}
+
+
+
+function ParticleCanvas() {
+
+  const canvasRef = useRef(null)
+
+  useEffect(() => {
+
+    const canvas = canvasRef.current
+
+    const ctx = canvas.getContext('2d')
+
+    let animId, particles = []
+
+    const COUNT = 70, DIST = 130
+
+    function resize(){ canvas.width=window.innerWidth; canvas.height=window.innerHeight }
+
+    resize(); window.addEventListener('resize', resize)
+
+    class P {
+
+      constructor(){
+
+        this.x=Math.random()*canvas.width; this.y=Math.random()*canvas.height
+
+        this.vx=(Math.random()-0.5)*0.35; this.vy=(Math.random()-0.5)*0.35
+
+        this.r=Math.random()*1.5+0.5; this.a=Math.random()*0.4+0.15
+
+      }
+
+      update(){
+
+        this.x+=this.vx; this.y+=this.vy
+
+        if(this.x<0||this.x>canvas.width) this.vx*=-1
+
+        if(this.y<0||this.y>canvas.height) this.vy*=-1
+
+      }
+
+      draw(){ ctx.beginPath(); ctx.arc(this.x,this.y,this.r,0,Math.PI*2); ctx.fillStyle='rgba(59,130,246,'+this.a+')'; ctx.fill() }
+
+    }
+
+    for(let i=0;i<COUNT;i++) particles.push(new P())
+
+    function animate(){
+
+      ctx.clearRect(0,0,canvas.width,canvas.height)
+
+      for(let i=0;i<particles.length;i++){
+
+        particles[i].update(); particles[i].draw()
+
+        for(let j=i+1;j<particles.length;j++){
+
+          const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y
+
+          const d=Math.sqrt(dx*dx+dy*dy)
+
+          if(d<DIST){ ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y); ctx.strokeStyle='rgba(59,130,246,'+(0.07*(1-d/DIST))+')'; ctx.lineWidth=0.6; ctx.stroke() }
+
+        }
+
+      }
+
+      animId=requestAnimationFrame(animate)
+
+    }
+
+    animate()
+
+    return ()=>{ cancelAnimationFrame(animId); window.removeEventListener('resize',resize) }
+
+  },[])
+
+  return <canvas ref={canvasRef} className="hero-canvas"/>
+
+}
+
+
+
+const NAV = [{id:'about',l:'关于'},{id:'projects',l:'项目'},{id:'certs',l:'证书'},{id:'skills',l:'�?�?},{id:'contact',l:'联系'}]
+
+function Navbar() {
+
+  const [scrolled,setScrolled] = useState(false)
+
+  useEffect(()=>{ const h=()=>setScrolled(window.scrollY>60); window.addEventListener('scroll',h,{passive:true}); return()=>window.removeEventListener('scroll',h) },[])
+
+  return (
+
+    <nav className={'navbar'+(scrolled?' navbar--scrolled':'')}>
+
+      <div className="navbar-inner">
+
+        <a href="#hero" className="navbar-logo">FSX</a>
+
+        <ul className="navbar-links">
+
+          {NAV.map(n => <li key={n.id}><a href={'#'+n.id} className="navbar-link">{n.l}</a></li>)}
+
+        </ul>
+
+      </div>
+
+    </nav>
+
+  )
+
+}
+
+
+
+function SecHead({eyebrow,title,sub}) {
+
+  return (<div className="sec-head">
+
+    {eyebrow && <span className="sec-head-eyebrow">{eyebrow}</span>}
+
+    <h2 className="sec-head-title">{title}</h2>
+
+    {sub && <p className="sec-head-sub">{sub}</p>}
+
+  </div>)
+
+}
+
+
+
+const STATS = [
+
+  {v:'4',u:'�?,l:'�?��项目',s:'从零到交�?},
+
+  {v:'3',u:'Agent',l:'多Agent协同',s:'架构设�?'},
+
+  {v:'4',u:'�?,l:'跨平台�?�?,s:'Web/App/桌面'},
+
+  {v:'6',u:'�?',l:'零漏发运�?,s:'100%到达�?},
+
+]
+
+function AboutSection() {
+
+  return (
+
+    <section id="about" className="section about">
+
+      <div className="container">
+
+        <SecHead eyebrow="ABOUT ME" title="从零�??，用项目说话" sub="�??在�? · �?��完成 4 �?��整项�?��覆盖 Web / 跨平�?App / AI �?���?/ 游戏�?�?/>
+
+        <div className="about-grid">
+
+          <div className="about-text glass-card">
+
+            <p>我是�?���?���?名本科在读的 AI 应用�?发工程师。从零自学全栈开发与大模型工程，�?��完成 4 �?��构想到交付的完整项目—�?�涵盖�? Agent 协同系统、跨平台音乐�?��器�?�AI 学业�?��化�?家�?�以及像素�?互动叙事游戏�?/p>
+
+            <p>持有<strong>阿里�?ACA 大模型工程师认证</strong>，获<strong>腾�? × 北师�?AI �?��营优�?证书</strong>（Top 15%）�?�擅长在不确定场�?���??�定位技�?��案并推进落地�?/p>
+
+          </div>
+
+          <div className="about-stats">
+
+            {STATS.map((s,i) => (
+
+              <div key={i} className="stat-card glass-card">
+
+                <div className="stat-val"><span className="num">{s.v}</span><span className="stat-unit">{s.u}</span></div>
+
+                <div className="stat-label">{s.l}</div>
+
+                <div className="stat-sub">{s.s}</div>
+
+              </div>
+
+            ))}
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  )
+
+}
+
+
+
+const PROJECTS = [
+
+  {name:'多Agent协同任务管理Web平台',desc:'3-Agent协同架构（�?�?执�?/审核），通过消息总线实现多轮任务分发与结果汇�?,tags:['OpenAI API','阿里云百�?,'Agent编排','HTML/CSS/JS'],metric:'40%',metricLabel:'完成率提�?},
+
+  {name:'聚合音乐�?��器App',desc:'�?�?��台（Android/iOS/Web/桌面），聚合网易�?QQ音乐/酷我/酷狗4大音�?,tags:['Flutter 3.x','Dart','Node.js','Express'],metric:'800',metricUnit:'ms',metricLabel:'搜索响应'},
+
+  {name:'AI学业管�?系统',desc:'覆盖8门�?程�?�?��醒窗口，每�?程日发�??次精准提醒，系统连续稳定运�?',tags:['Python 3.13','WorkBuddy','SMTP','HTML'],metric:'100%',metricLabel:'到达准确�?},
+
+  {name:'像素风互动叙事游�?,desc:'Godot 4引擎 + GPT Image 2生成4类像素�?美术素材�?�?���?���?信号驱动对话分支',tags:['Godot 4.3','GDScript 2.0','GPT Image 2','AI美术'],metric:'200',metricUnit:'ms',metricLabel:'场景切换'},
+
+]
+
+
+
+function CodeWindow() {
+
+  return (
+
+    <div className="project-code-window">
+
+      <div className="code-window-bar">
+
+        <span className="code-window-dot code-window-dot--r"/>
+
+        <span className="code-window-dot code-window-dot--y"/>
+
+        <span className="code-window-dot code-window-dot--g"/>
+
+        <span className="code-window-title">agent-orchestrator.js</span>
+
+      </div>
+
+      <pre className="code-window-body">{`}// 3-Agent 协同架构
+
+const agents = [
+
+  { role: "planner" },
+
+  { role: "executor" },
+
+  { role: "reviewer" },
+
+];
+
+
+
+const result = await orchestrate(agents, task);
+
+// 完成率提�?40%{`}</pre>
+
+    </div>
+
+  )
+
+}
+
+
+
+function ProjectsSection() {
+
+  return (
+
+    <section id="projects" className="section projects">
+
+      <div className="container">
+
+        <SecHead eyebrow="PROJECTS" title="精�?�项�? sub="4�?��立完成的�?���?���?��每一�?��从零构建"/>
+
+        <div className="projects-grid">
+
+          {PROJECTS.map((p,i) => (
+
+            <div key={i} className={'project-card glass-card'+(i===0?' project-card--wide':'')}>
+
+              {i===0 ? (
+
+                <>
+
+                  <div className="project-left">
+
+                    <div className="project-head">
+
+                      <span className="project-num">01</span>
+
+                      <h3 className="project-name">{p.name}</h3>
+
+                    </div>
+
+                    <p className="project-desc">{p.desc}</p>
+
+                    <div className="project-highlight">
+
+                      <span className="project-metric num">{p.metric}<small>{p.metricUnit||''}</small></span>
+
+                      <span className="project-metric-label">{p.metricLabel}</span>
+
+                    </div>
+
+                    <div className="project-tags">{p.tags.map(t => <span key={t} className="tag">{t}</span>)}</div>
+
+                  </div>
+
+                  <div className="project-right"><CodeWindow/></div>
+
+                </>
+
+              ) : (
+
+                <>
+
+                  <div className="project-head">
+
+                    <span className="project-num">{String(i+1).padStart(2,'0')}</span>
+
+                    <h3 className="project-name">{p.name}</h3>
+
+                  </div>
+
+                  <p className="project-desc">{p.desc}</p>
+
+                  <div className="project-highlight">
+
+                    <span className="project-metric num">{p.metric}{p.metricUnit && <small>{p.metricUnit}</small>}</span>
+
+                    <span className="project-metric-label">{p.metricLabel}</span>
+
+                  </div>
+
+                  <div className="project-tags">{p.tags.map(t => <span key={t} className="tag">{t}</span>)}</div>
+
+                </>
+
+              )}
+
+            </div>
+
+          ))}
+
+        </div>
+
+      </div>
+
+    </section>
+
+  )
+
+}
+
+
+
+const CERTS = [
+
+  {issuer:'阿里�?,name:'ACA 大模型工程师认证',year:'2026',badge:'ACA',subtitle:'大模型工程化能力官方认证',details:['大模型原理与架构','Prompt工程实践','模型部署与调�?]},
+
+  {issuer:'腾�? × 北京师范大�?',name:'AI�?��营优�?证书',year:'2026',badge:'Top 15%',subtitle:'大模型原�?· Prompt工程 · 3�?��战项�?,details:['Transformer / 注意力机�?,'RLHF与�?�?,'3�?��整实战项�?]},
+
+]
+
+function CertsSection() {
+
+  return (
+
+    <section id="certs" className="section certs">
+
+      <div className="container">
+
+        <SecHead eyebrow="CERTIFICATIONS" title="专业认证" sub="官方机构颁发，验证大模型工程化能�?/>
+
+        <div className="certs-grid">
+
+          {CERTS.map((c,i) => (
+
+            <div key={i} className="cert-card">
+
+              <div className="cert-shine"/>
+
+              <div className="cert-badge">{c.badge}</div>
+
+              <div className="cert-issuer">{c.issuer}</div>
+
+              <h3 className="cert-name">{c.name}</h3>
+
+              <p className="cert-subtitle">{c.subtitle}</p>
+
+              <ul className="cert-details">{c.details.map((d,j) => <li key={j}>{d}</li>)}</ul>
+
+              <div className="cert-year">{c.year}</div>
+
+            </div>
+
+          ))}
+
+        </div>
+
+      </div>
+
+    </section>
+
+  )
+
+}
+
+
+
+const SKILLS = [
+
+  {title:'大模型工�?,icon:'�?',tags:['OpenAI API','阿里云百炼MaaS','Prompt工程与调�?,'多Agent协同编排','AI�?��化工作流','RLHF基�?']},
+
+  {title:'全栈�?�?,icon:'�?,tags:['Python 3.13','JavaScript / Node.js 18','HTML / CSS','Flutter 3.x / Dart','GDScript 2.0','RESTful API设�?','前后�?���?,'跨平台开�?]},
+
+  {title:'AI内�?生产',icon:'🎨',tags:['即梦SeedDance 2.0','GPT Image 2','Codex','Claude Code','WorkBuddy','文生视�?Prompt','AI美术生成']},
+
+]
+
+function SkillsSection() {
+
+  return (
+
+    <section id="skills" className="section skills">
+
+      <div className="container">
+
+        <SecHead eyebrow="SKILLS" title="�?能矩�? sub="大模型工�?· 全栈�?�?· AI内�?生产，三位一�?/>
+
+        <div className="skills-grid">
+
+          {SKILLS.map((g,i) => (
+
+            <div key={i} className="skill-card glass-card">
+
+              <div className="skill-icon">{g.icon}</div>
+
+              <h3 className="skill-title">{g.title}</h3>
+
+              <div className="skill-tags">{g.tags.map(t => <span key={t} className="skill-tag">{t}</span>)}</div>
+
+            </div>
+
+          ))}
+
+        </div>
+
+        <p className="skills-cert-link">查看完整认证 �?<a href="#certs">专业认证</a></p>
+
+      </div>
+
+    </section>
+
+  )
+
+}
+
+
+
+function ContactSection() {
+
+  return (
+
+    <section id="contact" className="section contact">
+
+      <div className="container">
+
+        <SecHead eyebrow="CONTACT" title="让我�?���? sub="如果你�?我的项目感兴趣，或�?�有合�?�的机会，�?迎随时联�?/>
+
+        <div className="contact-cards">
+
+          <a href="mailto:2810075119@qq.com" className="contact-card glass-card">
+
+            <span className="contact-icon">�?/span>
+
+            <span className="contact-label">�??</span>
+
+            <span className="contact-value">2810075119@qq.com</span>
+
+          </a>
+
+          <div className="contact-card glass-card">
+
+            <span className="contact-icon">💬</span>
+
+            <span className="contact-label">�?��</span>
+
+            <span className="contact-value">17881952835</span>
+
+          </div>
+
+          <a href="tel:19899396313" className="contact-card glass-card">
+
+            <span className="contact-icon">📱</span>
+
+            <span className="contact-label">手机</span>
+
+            <span className="contact-value">19899396313</span>
+
+          </a>
+
+        </div>
+
+      </div>
+
+      <footer className="footer"><p>© 2026 �?���?· Built with React & Passion</p></footer>
+
+    </section>
+
+  )
+
+}
+
+
+
+export default function App() {
+
+  return (<>
+
+    <div className="noise-overlay"/>
+
+    <FabTop/>
+
+    <Navbar/>
+
+    <section id="hero" className="hero">
+
+      <ParticleCanvas/>
+
+      <div className="hero-deco">AI</div>
+
+      <div className="hero-overlay"/>
+
+      <div className="hero-content">
+
+        <p className="hero-eyebrow">AI APPLICATION DEVELOPER</p>
+
+        <h1 className="hero-name">�?���?/h1>
+
+        <p className="hero-tagline">AI 应用�?�?· 从构想到交付</p>
+
+        <div className="hero-ctas">
+
+          <a href="#projects" className="btn btn-primary">查看项目</a>
+
+          <a href="#contact" className="btn btn-ghost">联系�?/a>
+
+        </div>
+
+      </div>
+
+      <div className="hero-scroll"><span className="hero-scroll-line"/></div>
+
+    </section>
+
+    <Reveal><AboutSection/></Reveal>
+
+    <Reveal delay={1}><ProjectsSection/></Reveal>
+
+    <Reveal delay={1}><CertsSection/></Reveal>
+
+    <Reveal delay={2}><SkillsSection/></Reveal>
+
+    <Reveal><ContactSection/></Reveal>
+
+  </>)
+
+}
+
+
