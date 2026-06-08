@@ -73,6 +73,47 @@ function FabTop() {
   return <button className={'fab-top' + (show ? ' fab-top--show' : '')} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} aria-label="回到顶部">↑</button>
 }
 
+function OhziInteractionLayer() {
+  const cursorRef = useRef(null)
+  const holdTimerRef = useRef(null)
+  const [holding, setHolding] = useState(false)
+  const [progress, setProgress] = useState(0)
+
+  useEffect(() => {
+    const cursor = cursorRef.current
+    const onPointerMove = (event) => {
+      if (!cursor) return
+      cursor.style.setProperty('--cursor-left', event.clientX + 'px')
+      cursor.style.setProperty('--cursor-top', event.clientY + 'px')
+    }
+    const onScroll = () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight
+      setProgress(max > 0 ? Math.min(window.scrollY / max, 1) : 0)
+    }
+    onScroll()
+    window.addEventListener('pointermove', onPointerMove, { passive: true })
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+    return () => {
+      window.removeEventListener('pointermove', onPointerMove)
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+    }
+  }, [])
+
+  const goExplore = () => document.querySelector('#projects')?.scrollIntoView({ behavior: 'smooth' })
+  const startHold = () => {
+    setHolding(true)
+    holdTimerRef.current = window.setTimeout(goExplore, 680)
+  }
+  const stopHold = () => {
+    setHolding(false)
+    window.clearTimeout(holdTimerRef.current)
+  }
+
+  return <><div className="ohzi-cursor" ref={cursorRef} aria-hidden="true" /><button className={'ohzi-hold' + (holding ? ' ohzi-hold--active' : '')} onPointerDown={startHold} onPointerUp={stopHold} onPointerLeave={stopHold} onClick={goExplore} aria-label="按住或点击探索项目"><span className="ohzi-hold-halos"><i /><i /><i /><i /></span><strong>HOLD</strong><small>TO EXPLORE</small></button><div className="ohzi-progress" aria-hidden="true"><span style={{ transform: `scaleX(${progress})` }} /></div></>
+}
+
 function ParticleCanvas() {
   const canvasRef = useRef(null)
   useEffect(() => {
@@ -146,7 +187,7 @@ function StudioHero() {
     el.style.setProperty('--tilt-y', '0deg')
   }
 
-  return <section id="hero" className="hero hero--studio"><ParticleCanvas /><div className="studio-noise" /><div className="studio-orbits" aria-hidden="true"><span /><span /><span /><b>SHIP</b><b>BUILD</b><b>TRACE</b></div><div className="studio-marquee" aria-hidden="true"><span>BUILD / SHIP / VERIFY / REPEAT / </span><span>BUILD / SHIP / VERIFY / REPEAT / </span></div><div className="studio-layout"><aside className="studio-index hero-piece"><span>Portfolio 2026</span><strong>FSX</strong><small>Dongguan / Remote</small></aside><main className="studio-copy hero-piece"><p className="studio-kicker">Independent Application Builder</p><h1>冯诗鑫</h1><p className="studio-lede">我做能跑起来的工具：把想法拆成页面、接口、自动化流程，再让它稳定交付。</p><div className="studio-actions"><a href="#projects" className="btn btn-primary">查看项目现场</a><a href="#certs" className="btn btn-ghost">查看证书凭证</a></div></main><div className="studio-stage hero-piece" ref={stageRef} onPointerMove={handlePointerMove} onPointerLeave={resetPointer}><div className="studio-stage-inner"><div className="studio-scan" /><div className="studio-meter"><span /><span /><span /><span /><span /></div><div className="studio-terminal"><div className="studio-terminal-bar"><span /><span /><span /><strong>current-build.log</strong></div>{HERO_LOGS.map((line, index) => <p key={line}><span>{String(index + 1).padStart(2, '0')}</span>{line}</p>)}</div><div className="studio-panels">{STUDIO_PANELS.map((panel, index) => <article className="studio-panel" style={{ '--panel-index': index }} key={panel.code}><span>{panel.code}</span><h3>{panel.title}</h3><p>{panel.meta}</p><small>{panel.status}</small></article>)}</div><div className="studio-live"><i /> Live prototype surface</div></div></div></div><div className="studio-bottom hero-piece"><span>4 个完整项目</span><span>3 Agent 架构</span><span>100% 提醒到达</span><span>React + GSAP</span></div><div className="scroll-cue"><span /></div></section>
+  return <section id="hero" className="hero hero--studio"><ParticleCanvas /><div className="studio-noise" /><div className="studio-orbits" aria-hidden="true"><span /><span /><span /><b>SHIP</b><b>BUILD</b><b>TRACE</b></div><div className="studio-marquee" aria-hidden="true"><span>BUILD / SHIP / VERIFY / REPEAT / </span><span>BUILD / SHIP / VERIFY / REPEAT / </span></div><div className="studio-layout"><aside className="studio-index hero-piece"><span>Portfolio 2026</span><strong>FSX</strong><small>Dongguan / Remote</small></aside><main className="studio-copy hero-piece"><p className="studio-kicker">Independent Application Builder</p><h1 className="sr-only">冯诗鑫</h1><div className="studio-title" aria-hidden="true"><span>我做</span><span>能跑起来的工具</span></div><p className="studio-lede">把想法拆成页面、接口、自动化流程，再让它稳定交付。</p><div className="studio-actions"><a href="#projects" className="btn btn-primary">查看项目现场</a><a href="#certs" className="btn btn-ghost">查看证书凭证</a></div></main><div className="studio-stage hero-piece" ref={stageRef} onPointerMove={handlePointerMove} onPointerLeave={resetPointer}><div className="studio-stage-inner"><div className="studio-scan" /><div className="studio-meter"><span /><span /><span /><span /><span /></div><div className="studio-terminal"><div className="studio-terminal-bar"><span /><span /><span /><strong>current-build.log</strong></div>{HERO_LOGS.map((line, index) => <p key={line}><span>{String(index + 1).padStart(2, '0')}</span>{line}</p>)}</div><div className="studio-panels">{STUDIO_PANELS.map((panel, index) => <article className="studio-panel" style={{ '--panel-index': index }} key={panel.code}><span>{panel.code}</span><h3>{panel.title}</h3><p>{panel.meta}</p><small>{panel.status}</small></article>)}</div><div className="studio-live"><i /> Live prototype surface</div></div></div></div><div className="studio-bottom hero-piece"><span>4 个完整项目</span><span>3 Agent 架构</span><span>100% 提醒到达</span><span>React + GSAP</span></div><div className="studio-explore-hint hero-piece"><span>DRAG / HOLD / SCROLL</span><strong>Explore the build</strong></div><div className="scroll-cue"><span /></div></section>
 }
 
 function Hero() {
@@ -213,8 +254,10 @@ export default function App() {
     })
     ScrollTrigger.batch('.card-anim', { start: 'top 86%', interval: 0.08, batchMax: 4, onEnter: (batch) => gsap.fromTo(batch, { y: 42, opacity: 0, scale: 0.985 }, { y: 0, opacity: 1, scale: 1, duration: 0.75, stagger: 0.08, ease: 'power3.out', overwrite: true }), onLeaveBack: (batch) => gsap.to(batch, { y: 24, opacity: 0.35, duration: 0.35, stagger: 0.04, overwrite: true }) })
   }, { scope: appRef })
-  return <div ref={appRef}><div className="noise-overlay" /><Navbar /><FabTop /><Hero /><AboutSection /><ProjectsSection /><CertsSection /><SkillsSection /><ContactSection /></div>
+  return <div ref={appRef}><div className="noise-overlay" /><Navbar /><FabTop /><OhziInteractionLayer /><Hero /><AboutSection /><ProjectsSection /><CertsSection /><SkillsSection /><ContactSection /></div>
 }
+
+
 
 
 
