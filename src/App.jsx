@@ -41,8 +41,8 @@ const HERO_LOGS = [
 ]
 
 const CERTS = [
-  { issuer: '阿里云', name: 'ACA 大模型工程师认证', badge: 'ACA', year: '2026', subtitle: '大模型工程化能力官方认证', image: '/certificates/aliyun-aca.png', imageAlt: '阿里云 ACA 大模型工程师认证证书', details: ['大模型原理与架构', 'Prompt 工程实践', '模型部署与调优'] },
-  { issuer: '腾讯 × 北京师范大学', name: 'AI 训练营优秀证书', badge: 'Top 15%', year: '2026', subtitle: '大模型原理 / Prompt 工程 / 3 个实战项目', image: '/certificates/tencent-bnu-ai.png', imageAlt: '腾讯扣叮与北京师范大学人工智能教育培训荣誉证书', details: ['Transformer 与注意力机制', 'RLHF 与对齐基础', '完成 3 个实战项目'] },
+  { issuer: '阿里云', name: 'ACA 大模型工程师认证', badge: 'ACA', year: '2026', subtitle: '大模型工程化能力官方认证', image: import.meta.env.BASE_URL + 'certificates/aliyun-aca.png', imageAlt: '阿里云 ACA 大模型工程师认证证书', details: ['大模型原理与架构', 'Prompt 工程实践', '模型部署与调优'] },
+  { issuer: '腾讯 × 北京师范大学', name: 'AI 训练营优秀证书', badge: 'Top 15%', year: '2026', subtitle: '大模型原理 / Prompt 工程 / 3 个实战项目', image: import.meta.env.BASE_URL + 'certificates/tencent-bnu-ai.png', imageAlt: '腾讯扣叮与北京师范大学人工智能教育培训荣誉证书', details: ['Transformer 与注意力机制', 'RLHF 与对齐基础', '完成 3 个实战项目'] },
 ]
 
 const SKILLS = [
