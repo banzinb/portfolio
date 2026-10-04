@@ -46,11 +46,26 @@ const TDAI_REPO = 'https://github.com/TencentCloud/TencentDB-Agent-Memory'
 
 const NAV = [
   { id: 'work', label: '项目' },
-  { id: 'opensource', label: '开源' },
   { id: 'experience', label: '经历' },
+  { id: 'opensource', label: '开源' },
   { id: 'capability', label: '能力' },
   { id: 'credentials', label: '认证' },
   { id: 'contact', label: '联系' },
+]
+
+const TICKER = [
+  'ANDROID AGENT',
+  'PROOT / ALPINE',
+  'ACCESSIBILITY SERVICE',
+  'QGIS PLUGIN',
+  'GEO-SAM · SAM2.1',
+  'VLM CLASSIFY',
+  'FLUTTER',
+  'JUST_AUDIO',
+  'NODE PROXY',
+  'MCP SERVER',
+  'TYPESCRIPT SDK',
+  'TESTS 10 / 10',
 ]
 
 const HERO_STATS = [
@@ -603,9 +618,12 @@ function Hero({ reduced }) {
 
         <h1 className="hero-name">冯诗鑫</h1>
         <p className="hero-line">
-          把模型接进真实设备，
-          <br />
-          把想法做成能跑起来的产品。
+          <span className="hero-line-mask">
+            <span>把模型接进真实设备，</span>
+          </span>
+          <span className="hero-line-mask">
+            <span>把想法做成能跑起来的产品。</span>
+          </span>
         </p>
         <p className="hero-lede">
           从 Android 端侧 Agent、遥感视觉工具到跨端音乐应用，一个人完成选题、架构、开发和发布。
@@ -631,7 +649,7 @@ function Hero({ reduced }) {
         <dl className="hero-stats">
           {HERO_STATS.map((stat) => (
             <div key={stat.label}>
-              <dt>{stat.value}</dt>
+              <dt data-count={stat.value}>{stat.value}</dt>
               <dd>
                 {stat.label}
                 <small>{stat.note}</small>
@@ -648,7 +666,7 @@ function Hero({ reduced }) {
 
 function SectionHead({ index, eyebrow, title, sub }) {
   return (
-    <header className="section-head" data-reveal>
+    <header className="section-head">
       <p className="section-eyebrow">
         <span>{index}</span>
         {eyebrow}
@@ -656,6 +674,25 @@ function SectionHead({ index, eyebrow, title, sub }) {
       <h2>{title}</h2>
       {sub ? <p className="section-sub">{sub}</p> : null}
     </header>
+  )
+}
+
+function Ticker() {
+  return (
+    <div className="ticker" aria-hidden="true">
+      <div className="ticker-track">
+        {[0, 1].map((group) => (
+          <div className="ticker-group" key={group}>
+            {TICKER.map((item) => (
+              <span key={item}>
+                {item}
+                <i />
+              </span>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }
 
@@ -688,7 +725,7 @@ function Work() {
 
         <div className="work-list">
           {PROJECTS.map((project) => (
-            <article className={'work work--' + project.accent} key={project.id} data-reveal>
+            <article className={'work work--' + project.accent} key={project.id}>
               <header className="work-head">
                 <span className="work-index">{project.index}</span>
                 <div className="work-title">
@@ -732,7 +769,7 @@ function Work() {
                   <dl className="work-facts">
                     {project.facts.map((fact) => (
                       <div key={fact.label}>
-                        <dt>{fact.value}</dt>
+                        <dt data-count={fact.value}>{fact.value}</dt>
                         <dd>{fact.label}</dd>
                       </div>
                     ))}
@@ -754,12 +791,58 @@ function Work() {
   )
 }
 
-function OpenSource() {
+function Experience() {
   return (
-    <section className="section section--alt" id="opensource">
+    <section className="section section--alt" id="experience">
       <div className="container">
         <SectionHead
           index="02"
+          eyebrow="EXPERIENCE"
+          title="两段实习，两种训练"
+          sub="一段在内容和工具之间做产品，一段在人和岗位之间做匹配。"
+        />
+
+        <div className="exp-list">
+          {EXPERIENCE.map((item) => {
+            const Icon = item.icon
+            return (
+              <article className="exp-item" key={item.org} data-reveal>
+                <div className="exp-side">
+                  <span className="exp-icon">
+                    <Icon size={17} />
+                  </span>
+                  <p className="exp-period">{item.period}</p>
+                  <p className="exp-mode">{item.mode}</p>
+                </div>
+                <div className="exp-main">
+                  <h3>{item.role}</h3>
+                  <p className="exp-org">{item.org}</p>
+                  <ul className="exp-lines">
+                    {item.lines.map((line) => (
+                      <li key={line}>{line}</li>
+                    ))}
+                  </ul>
+                  <div className="chips chips--sm">
+                    {item.tech.map((tag) => (
+                      <span key={tag}>{tag}</span>
+                    ))}
+                  </div>
+                </div>
+              </article>
+            )
+          })}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function OpenSource() {
+  return (
+    <section className="section" id="opensource">
+      <div className="container">
+        <SectionHead
+          index="03"
           eyebrow="OPEN SOURCE"
           title="在别人的项目里改代码"
           sub="不只是提 issue：读源码、改实现、补测试，然后走一遍上游的评审流程。"
@@ -799,52 +882,6 @@ function OpenSource() {
                   <ExternalLink size={15} />
                 </span>
               </a>
-            )
-          })}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function Experience() {
-  return (
-    <section className="section" id="experience">
-      <div className="container">
-        <SectionHead
-          index="03"
-          eyebrow="EXPERIENCE"
-          title="两段实习，两种训练"
-          sub="一段在内容和工具之间做产品，一段在人和岗位之间做匹配。"
-        />
-
-        <div className="exp-list">
-          {EXPERIENCE.map((item) => {
-            const Icon = item.icon
-            return (
-              <article className="exp-item" key={item.org} data-reveal>
-                <div className="exp-side">
-                  <span className="exp-icon">
-                    <Icon size={17} />
-                  </span>
-                  <p className="exp-period">{item.period}</p>
-                  <p className="exp-mode">{item.mode}</p>
-                </div>
-                <div className="exp-main">
-                  <h3>{item.role}</h3>
-                  <p className="exp-org">{item.org}</p>
-                  <ul className="exp-lines">
-                    {item.lines.map((line) => (
-                      <li key={line}>{line}</li>
-                    ))}
-                  </ul>
-                  <div className="chips chips--sm">
-                    {item.tech.map((tag) => (
-                      <span key={tag}>{tag}</span>
-                    ))}
-                  </div>
-                </div>
-              </article>
             )
           })}
         </div>
@@ -1067,55 +1104,271 @@ export default function App() {
 
   useGSAP(
     () => {
-      if (reduced) return
+      if (reduced) return undefined
 
-      gsap.from('.hero-eyebrow, .hero-name, .hero-line, .hero-lede, .hero-actions', {
-        y: 26,
-        opacity: 0,
-        duration: 0.9,
-        ease: 'power3.out',
-        stagger: 0.08,
-        delay: 0.1,
+      const tickers = []
+
+      /* ---------- hero entrance ---------- */
+      const intro = gsap.timeline({ defaults: { ease: 'power3.out' }, delay: 0.12 })
+      intro
+        .from('.hero-eyebrow', { y: 20, autoAlpha: 0, duration: 0.7 })
+        .from(
+          '.hero-name',
+          {
+            yPercent: 26,
+            autoAlpha: 0,
+            rotateX: -34,
+            transformPerspective: 900,
+            transformOrigin: '50% 100%',
+            duration: 1.1,
+          },
+          '-=0.4',
+        )
+        .from(
+          '.hero-line-mask > span',
+          { yPercent: 118, duration: 1, ease: 'power4.out', stagger: 0.09 },
+          '-=0.66',
+        )
+        .from('.hero-lede', { y: 18, autoAlpha: 0, duration: 0.7 }, '-=0.66')
+        .from('.hero-actions .btn', { y: 16, autoAlpha: 0, duration: 0.6, stagger: 0.07 }, '-=0.52')
+        .from(
+          '.deck',
+          { y: 56, autoAlpha: 0, rotateX: 9, transformPerspective: 1600, duration: 1.1 },
+          '-=0.4',
+        )
+        .from('.hero-stats > div', { y: 22, autoAlpha: 0, duration: 0.6, stagger: 0.07 }, '-=0.72')
+        .from('.ticker', { autoAlpha: 0, duration: 0.6 }, '-=0.5')
+
+      /* ---------- ambient life ---------- */
+      gsap.to('.deck-glow', {
+        scale: 1.09,
+        opacity: 0.4,
+        duration: 5,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
       })
 
-      gsap.from('.deck', {
-        y: 46,
-        opacity: 0,
-        duration: 1.1,
-        ease: 'power3.out',
-        delay: 0.45,
+      /* ---------- reading progress ---------- */
+      gsap.to('.scroll-progress span', {
+        scaleX: 1,
+        ease: 'none',
+        scrollTrigger: { start: 0, end: 'max', scrub: 0.25 },
       })
 
-      gsap.from('.hero-stats > div', {
-        y: 20,
-        opacity: 0,
-        duration: 0.7,
-        ease: 'power2.out',
-        stagger: 0.08,
-        delay: 0.7,
+      /* ---------- hero parallax + deck sinking ---------- */
+      gsap.to('.hero-spot', {
+        yPercent: 20,
+        scale: 1.12,
+        ease: 'none',
+        scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true },
+      })
+      gsap.to('.hero-grid', {
+        yPercent: 10,
+        ease: 'none',
+        scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true },
+      })
+      gsap.to('.deck-stage', {
+        yPercent: -14,
+        scale: 0.88,
+        autoAlpha: 0.4,
+        ease: 'none',
+        scrollTrigger: { trigger: '.deck', start: 'top 34%', end: 'bottom top', scrub: 0.4 },
       })
 
-      gsap.utils.toArray('[data-reveal]').forEach((element) => {
-        gsap.from(element, {
-          y: 32,
-          opacity: 0,
-          duration: 0.85,
+      /* ---------- section headings ---------- */
+      gsap.utils.toArray('.section-head').forEach((head) => {
+        gsap.from(head.children, {
+          y: 28,
+          autoAlpha: 0,
+          duration: 0.8,
           ease: 'power3.out',
-          scrollTrigger: { trigger: element, start: 'top 88%', once: true },
+          stagger: 0.1,
+          scrollTrigger: { trigger: head, start: 'top 86%', once: true },
         })
       })
 
-      gsap.utils.toArray('.work-visual img').forEach((image) => {
-        gsap.fromTo(
-          image,
-          { scale: 1.06 },
-          {
-            scale: 1,
-            ease: 'none',
-            scrollTrigger: { trigger: image, start: 'top bottom', end: 'bottom top', scrub: true },
-          },
-        )
+      /* ---------- case studies ---------- */
+      gsap.utils.toArray('.work').forEach((item) => {
+        const head = item.querySelectorAll('.work-index, .work-title h3, .work-title p, .work-meta')
+        const copy = item.querySelector('.work-copy')
+        const media = item.querySelector('.work-media')
+
+        gsap.from(head, {
+          y: 24,
+          autoAlpha: 0,
+          duration: 0.75,
+          ease: 'power3.out',
+          stagger: 0.08,
+          scrollTrigger: { trigger: item, start: 'top 82%', once: true },
+        })
+
+        if (media) {
+          gsap.fromTo(
+            media,
+            { clipPath: 'inset(14% 0% 14% 0%)' },
+            {
+              clipPath: 'inset(0% 0% 0% 0%)',
+              duration: 1.15,
+              ease: 'power3.out',
+              scrollTrigger: { trigger: media, start: 'top 88%', once: true },
+            },
+          )
+
+          gsap.utils.toArray(media.querySelectorAll('.shot')).forEach((shot, index) => {
+            gsap.fromTo(
+              shot,
+              { y: index % 2 === 0 ? 22 : 38 },
+              {
+                y: -14,
+                ease: 'none',
+                scrollTrigger: { trigger: media, start: 'top bottom', end: 'bottom top', scrub: 0.4 },
+              },
+            )
+          })
+        }
+
+        if (copy) {
+          gsap.from(copy.querySelectorAll('.work-summary, .work-points li, .chips, .work-facts, .text-link'), {
+            y: 24,
+            autoAlpha: 0,
+            duration: 0.7,
+            ease: 'power2.out',
+            stagger: 0.06,
+            scrollTrigger: { trigger: copy, start: 'top 84%', once: true },
+          })
+        }
       })
+
+      /* ---------- card batches ---------- */
+      const cards = gsap.utils.toArray('[data-reveal]')
+      if (cards.length) {
+        gsap.set(cards, { y: 34, autoAlpha: 0 })
+        ScrollTrigger.batch(cards, {
+          start: 'top 88%',
+          once: true,
+          onEnter: (batch) =>
+            gsap.to(batch, {
+              y: 0,
+              autoAlpha: 1,
+              duration: 0.85,
+              ease: 'power3.out',
+              stagger: 0.1,
+              overwrite: true,
+            }),
+        })
+      }
+
+      /* ---------- number count-up ---------- */
+      const counters = gsap.utils.toArray('.hero-stats dt, .work-facts dt').map((element) => {
+        const source = element.dataset.count || element.textContent.trim()
+        const pair = source.match(/^(\d+)\s*\/\s*(\d+)$/)
+        const single = source.match(/^(\d+)$/)
+        return { element, source, pair, single }
+      })
+
+      counters.forEach(({ element, source, pair, single }) => {
+        if (!pair && !single) return
+
+        const target = pair ? [Number(pair[1]), Number(pair[2])] : [Number(single[1]), 0]
+        const counter = { a: 0, b: 0 }
+
+        gsap.to(counter, {
+          a: target[0],
+          b: target[1],
+          duration: 1.3,
+          ease: 'power2.out',
+          scrollTrigger: { trigger: element, start: 'top 94%', once: true },
+          onUpdate: () => {
+            element.textContent = pair
+              ? `${Math.round(counter.a)} / ${Math.round(counter.b)}`
+              : `${Math.round(counter.a)}`
+          },
+        })
+      })
+
+      tickers.push(() => {
+        counters.forEach(({ element, source }) => {
+          element.textContent = source
+        })
+      })
+
+      /* ---------- scroll-velocity ticker ---------- */
+      const track = rootRef.current?.querySelector('.ticker-track')
+      if (track) {
+        const setXPercent = gsap.quickSetter(track, 'xPercent')
+        const setSkew = gsap.quickSetter(track, 'skewX')
+        let progress = 0
+        let speed = 1
+        let skew = 0
+        let targetSkew = 0
+        let idle = 0
+
+        const tick = (time, delta) => {
+          progress = (progress + (delta / 1000 / 28) * speed) % 1
+          skew += (targetSkew - skew) * 0.08
+          setXPercent(-50 * progress)
+          setSkew(skew)
+        }
+        gsap.ticker.add(tick)
+        tickers.push(() => gsap.ticker.remove(tick))
+
+        const velocityTrigger = ScrollTrigger.create({
+          start: 0,
+          end: 'max',
+          onUpdate: (self) => {
+            const velocity = self.getVelocity()
+            speed = gsap.utils.clamp(1, 7, 1 + Math.abs(velocity) / 700)
+            targetSkew = gsap.utils.clamp(-8, 8, velocity / 320)
+            window.clearTimeout(idle)
+            idle = window.setTimeout(() => {
+              speed = 1
+              targetSkew = 0
+            }, 220)
+          },
+        })
+        tickers.push(() => {
+          window.clearTimeout(idle)
+          velocityTrigger.kill()
+        })
+      }
+
+      /* ---------- magnetic buttons ---------- */
+      gsap.utils.toArray('.btn').forEach((button) => {
+        const xTo = gsap.quickTo(button, 'x', { duration: 0.45, ease: 'power3.out' })
+        const yTo = gsap.quickTo(button, 'y', { duration: 0.45, ease: 'power3.out' })
+
+        const onMove = (event) => {
+          const rect = button.getBoundingClientRect()
+          xTo((event.clientX - (rect.left + rect.width / 2)) * 0.16)
+          yTo((event.clientY - (rect.top + rect.height / 2)) * 0.3 - 2)
+        }
+        const onLeave = () => {
+          xTo(0)
+          yTo(0)
+        }
+
+        button.addEventListener('pointermove', onMove)
+        button.addEventListener('pointerleave', onLeave)
+        tickers.push(() => {
+          button.removeEventListener('pointermove', onMove)
+          button.removeEventListener('pointerleave', onLeave)
+        })
+      })
+
+      /* ---------- keep triggers accurate ---------- */
+      let alive = true
+      const refresh = () => {
+        if (alive) ScrollTrigger.refresh()
+      }
+      if (document.fonts?.ready) document.fonts.ready.then(refresh)
+      window.addEventListener('load', refresh)
+      tickers.push(() => window.removeEventListener('load', refresh))
+
+      return () => {
+        alive = false
+        tickers.forEach((dispose) => dispose())
+      }
     },
     { scope: rootRef, dependencies: [reduced] },
   )
@@ -1125,12 +1378,16 @@ export default function App() {
       <a className="skip-link" href="#work">
         跳到项目
       </a>
+      <div className="scroll-progress" aria-hidden="true">
+        <span />
+      </div>
       <Nav />
       <main>
         <Hero reduced={reduced} />
+        <Ticker />
         <Work />
-        <OpenSource />
         <Experience />
+        <OpenSource />
         <Capability />
         <Credentials />
         <Contact />
