@@ -45,11 +45,11 @@ const HY3_REPO = 'https://github.com/Tencent-Hunyuan/Hy3'
 const TDAI_REPO = 'https://github.com/TencentCloud/TencentDB-Agent-Memory'
 
 const NAV = [
-  { id: 'work', label: '项目' },
   { id: 'experience', label: '经历' },
-  { id: 'opensource', label: '开源' },
-  { id: 'capability', label: '能力' },
   { id: 'credentials', label: '认证' },
+  { id: 'work', label: '项目' },
+  { id: 'activity', label: '活动' },
+  { id: 'capability', label: '能力' },
   { id: 'contact', label: '联系' },
 ]
 
@@ -188,23 +188,23 @@ const PROJECTS = [
   },
 ]
 
-const OPEN_SOURCE = [
+const ACTIVITY = [
   {
     name: 'Hy3 Research MCP Server',
-    meta: 'Tencent Hunyuan Hy3 · 犀牛鸟 2026 Issue #3',
-    status: 'PR #227 · open',
+    meta: '犀牛鸟 2026 · Tencent Hunyuan Hy3 · Issue #3',
+    status: '活动任务',
     icon: Bot,
     href: HY3_REPO,
-    body: '用 TypeScript MCP SDK 把 Hy3 的检索与推理能力做成一套可复用的工具服务：hy3_search、hy3_analyze、hy3_research、hy3_format_report 四个工具，stdio 传输，可选 Tavily 数据源，兼容 Chat Completions 与 Responses 两种官方接口协议。',
+    body: '活动任务要求用 MCP 协议做一个由 Hy3 驱动的服务器。用 TypeScript MCP SDK 落地 hy3_search、hy3_analyze、hy3_research、hy3_format_report 四个工具，stdio 传输，可选 Tavily 数据源，并兼容 Chat Completions 与 Responses 两种官方接口协议。',
     bullets: ['4 个 MCP 工具', '8 / 8 测试通过', '提供 CodeBuddy / Cursor / Cline 配置示例'],
   },
   {
     name: 'TencentDB Agent Memory',
     meta: 'TencentCloud · Agent 记忆模块',
-    status: 'Fork 贡献',
+    status: '模块适配',
     icon: Database,
     href: TDAI_REPO,
-    body: '为 Agent 记忆模块补齐 Gemini CLI 适配，并清理会话历史里遗留的 recall 注入：把不该继续出现在上下文里的历史片段剥离出来，让长会话的记忆读取更干净。',
+    body: '在 Agent 记忆模块上做的一次适配实践：补齐 Gemini CLI 接入，并清理会话历史里遗留的 recall 注入，把不该继续出现在上下文里的历史片段剥离出去，让长会话的记忆读取更干净。',
     bullets: ['Gemini CLI adapter', 'legacy recall 清理', '会话历史处理'],
   },
 ]
@@ -717,7 +717,7 @@ function Work() {
     <section className="section section--work" id="work">
       <div className="container">
         <SectionHead
-          index="01"
+          index="03"
           eyebrow="SELECTED WORK"
           title="三个自己从零做完的项目"
           sub="每个项目都跑到了能被别人使用的程度：有发布版本、有测试、有真实的作业界面。"
@@ -793,10 +793,10 @@ function Work() {
 
 function Experience() {
   return (
-    <section className="section section--alt" id="experience">
+    <section className="section" id="experience">
       <div className="container">
         <SectionHead
-          index="02"
+          index="01"
           eyebrow="EXPERIENCE"
           title="两段实习，两种训练"
           sub="一段在内容和工具之间做产品，一段在人和岗位之间做匹配。"
@@ -837,19 +837,19 @@ function Experience() {
   )
 }
 
-function OpenSource() {
+function Activity() {
   return (
-    <section className="section" id="opensource">
+    <section className="section section--alt" id="activity">
       <div className="container">
         <SectionHead
-          index="03"
-          eyebrow="OPEN SOURCE"
-          title="在别人的项目里改代码"
-          sub="不只是提 issue：读源码、改实现、补测试，然后走一遍上游的评审流程。"
+          index="04"
+          eyebrow="TENCENT RHINO-BIRD"
+          title="腾讯犀牛鸟人才活动"
+          sub="活动以真实仓库的技术任务为题目：独立完成交付，并通过接口验证与自动化测试。"
         />
 
         <div className="os-grid">
-          {OPEN_SOURCE.map((item) => {
+          {ACTIVITY.map((item) => {
             const Icon = item.icon
             return (
               <a
@@ -892,10 +892,10 @@ function OpenSource() {
 
 function Capability() {
   return (
-    <section className="section section--alt" id="capability">
+    <section className="section" id="capability">
       <div className="container">
         <SectionHead
-          index="04"
+          index="05"
           eyebrow="CAPABILITY"
           title="我能接住哪一段"
           sub="比起罗列工具，更想说明白：什么问题交给我，能推到什么程度。"
@@ -944,10 +944,10 @@ function Credentials() {
   const active = openIndex === null ? null : CREDENTIALS[openIndex]
 
   return (
-    <section className="section" id="credentials">
+    <section className="section section--alt" id="credentials">
       <div className="container">
         <SectionHead
-          index="05"
+          index="02"
           eyebrow="CREDENTIALS"
           title="可以核验的凭证"
           sub="证书只说明基础，真正的验证还是在项目里。点击可以看原图。"
@@ -1375,8 +1375,8 @@ export default function App() {
 
   return (
     <div className="app" ref={rootRef}>
-      <a className="skip-link" href="#work">
-        跳到项目
+      <a className="skip-link" href="#experience">
+        跳到主要内容
       </a>
       <div className="scroll-progress" aria-hidden="true">
         <span />
@@ -1385,11 +1385,11 @@ export default function App() {
       <main>
         <Hero reduced={reduced} />
         <Ticker />
-        <Work />
         <Experience />
-        <OpenSource />
-        <Capability />
         <Credentials />
+        <Work />
+        <Activity />
+        <Capability />
         <Contact />
       </main>
     </div>
